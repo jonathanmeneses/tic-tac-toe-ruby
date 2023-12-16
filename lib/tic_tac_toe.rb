@@ -115,15 +115,19 @@ class Board
       puts "#{player}: What is your move?" # Use puts for the prompt
       move = gets.chomp.to_i
       if self.valid_move?(move)
-        row = (move-1) / BOARD_DIM
-        col = (move-1) % BOARD_DIM
-        self.board[row][col] = player # Update the board with the player’s symbol
+        place_move(player, move)
         waiting_for_input = false # Break the loop
       else
         self.show_board()
         puts "Invalid Move! Please try again"
       end
     end
+  end
+
+  def place_move(player, move)
+    row = (move-1) / BOARD_DIM
+    col = (move-1) % BOARD_DIM
+    self.board[row][col] = player # Update the board with the player’s symbol
   end
 
 end

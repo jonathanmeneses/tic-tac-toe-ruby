@@ -181,15 +181,140 @@ describe Board do
 
   end
 
+  describe '#show_board' do
+    subject(:display_board) {described_class.new}
 
+    it 'calls puts 5 times' do
+      expect($stdout).to receive(:puts).exactly(5).times
+      display_board.show_board
+    end
+  end
 
+  describe '#get_move' do
+    subject(:display_board) {described_class.new}
+    let(:player) {'X'}
+
+    context 'when a valid move is received' do
+      before do
+        valid_move = '3'
+
+        allow(display_board).to receive(:gets).and_return(valid_move)
+        allow(display_board).to receive(:valid_move?).and_return(true)
+        allow(display_board).to receive(:place_move)
+      end
+
+      it 'sends the move to the board' do
+        player = 'X'
+        expect(display_board).to receive(:place_move).with(player, 3)
+        display_board.get_move(player)
+      end
+    end
+
+    context 'when an invalid move, then a valid move is received' do
+      before do
+
+        allow(display_board).to receive(:gets).and_return('invalid','3')
+        allow(display_board).to receive(:valid_move?).and_return(false,true)
+        allow(display_board).to receive(:place_move)
+        allow(display_board).to receive(:show_board)
+      end
+
+      it 'loops through an error the move to the board' do
+        prompt_message = "X: What is your move?"
+        error_message = "Invalid Move! Please try again"
+        expect(display_board).to receive(:puts).with(prompt_message).twice
+        expect(display_board).to receive(:puts).with(error_message).once
+        expect(display_board).to receive(:place_move).with(player, 3)
+        display_board.get_move(player)
+      end
+    end
+
+  end
+
+  describe '#place_move' do
+
+    subject(:display_board) {described_class.new}
+    let(:player) {'X'}
+
+    context 'when place move is called' do
+      it 'updates the correct position on the board' do
+        expect {display_board.place_move(player,1)}
+          .to change {display_board.board[0][0]}
+            .from(" ")
+            .to("X")
+      end
+    end
+  end
 
 end
 
+describe TicTacToe do
+
+  describe '#swap_player' do
+
+    context 'when the player swap is called on X' do
+      subject(:player_game) {described_class.new}
 
 
-  #Board
-  # check_win
-  # show_board
-  # get_move --> Break out to "place move" and "get move"
-  # create a game_over method
+      it 'players are swapped correctly' do
+        player_game.instance_variable_set(:@player_turn,'X')
+        expect {player_game.swap_player}
+          .to change {player_game.instance_variable_get(:@player_turn)}
+            .from("X")
+            .to("O")
+      end
+    end
+
+    context 'when the player swap is called on O' do
+      subject(:player_game) {described_class.new}
+
+
+      it 'players are swapped correctly' do
+        player_game.instance_variable_set(:@player_turn,'O')
+        expect {player_game.swap_player}
+          .to change {player_game.instance_variable_get(:@player_turn)}
+            .from("O")
+            .to("X")
+      end
+    end
+  end
+
+  describe '#play_game' do
+  subject(:tic_tac_toe) { TicTacToe.new }
+  let(:board_double) { instance_double(Board) }
+
+  before do
+    allow(Board).to receive(:new).and_return(board_double)
+    allow(board_double).to receive(:show_board)
+    allow(board_double).to receive(:get_move)
+    allow(board_double).to receive(:check_win).and_return(false)
+    allow(board_double).to receive(:check_draw).and_return(false)
+  end
+
+  context 'when a game is played without a win or a draw' do
+    it 'continues to swap players and get moves' do
+      allow(board_double).to receive(:check_win).and_return(false,false,false,true)
+      expect(board_double).to receive(:get_move).at_least(:twice)
+      expect(tic_tac_toe).to receive(:swap_player).at_least(:once)
+      tic_tac_toe.play_game
+    end
+  end
+
+  context 'when a player wins' do
+    it 'ends the game with a win message' do
+      allow(board_double).to receive(:check_win).and_return(true)
+      expect(tic_tac_toe).to receive(:puts).with(/wins/)
+      tic_tac_toe.play_game
+    end
+  end
+
+  context 'when the game is a draw' do
+    it 'ends the game with a draw message' do
+      allow(board_double).to receive(:check_win).and_return(false)
+      allow(board_double).to receive(:check_draw).and_return(true)
+      expect(tic_tac_toe).to receive(:puts).with("Oh No! It's a draw!")
+      tic_tac_toe.play_game
+    end
+  end
+end
+end
