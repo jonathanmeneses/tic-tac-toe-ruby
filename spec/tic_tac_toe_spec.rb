@@ -9,7 +9,7 @@ describe Board do
 
   describe '#initialize' do
     context 'When a board is created' do
-      subject(:test_board) { Board.new }
+      subject(:test_board) { described_class.new }
       it 'there are 9 empty square' do
         expect(test_board.board).to eq([[" "," "," "],[" "," "," "],[" "," "," "]])
       end
@@ -20,7 +20,7 @@ describe Board do
   context 'check win conditions' do
 
     describe '#check_horizontal_win' do
-      subject(:horizontal_win) { Board.new }
+      subject(:horizontal_win) { described_class.new }
       context 'When there is a winning condition' do
 
         context 'when a horizontal row is filled with the same symbols' do
@@ -48,7 +48,7 @@ describe Board do
     end
 
     describe '#check_vertical_win' do
-      subject(:vertical_win) { Board.new }
+      subject(:vertical_win) { described_class.new }
       context 'When there is a winning condition' do
 
         context 'when a vertical row is filled with the same symbols' do
@@ -75,7 +75,7 @@ describe Board do
     end
 
     describe '#check_diagonal_win' do
-      subject(:diagonal_win) {Board.new}
+      subject(:diagonal_win) {described_class.new}
 
       context 'when a diagonal is filled with the same symbols' do
         before do
@@ -101,7 +101,7 @@ describe Board do
     end
 
     describe '#check_antidiagonal_win' do
-    subject(:antidiagonal_win) {Board.new}
+    subject(:antidiagonal_win) {described_class.new}
 
       context 'when an antidiagonal is filled with the same symbols' do
         before do
@@ -130,7 +130,7 @@ describe Board do
   end
 
   describe '#check_draw' do
-    subject(:draw_board) {Board.new}
+    subject(:draw_board) {described_class.new}
 
     context 'when a board is full' do
       before do
@@ -153,13 +153,43 @@ describe Board do
     end
   end
 
+  describe '#valid_move?' do
+
+    subject(:move_board) {described_class.new}
+
+    context 'when there is a valid move' do
+      before do
+        move_board.board = [[" ","O","O"],["O","X","X"],["X","O","O"]]
+      end
+
+      it 'returns a valid move' do
+        move = 1
+        expect(move_board.valid_move?(move)).to be(true)
+      end
+    end
+
+    context 'when there is an invalid move' do
+      before do
+        move_board.board = [[" ","O","O"],["O","X","X"],["X","O","O"]]
+      end
+
+      it 'returns a valid move' do
+        move = 2
+        expect(move_board.valid_move?(move)).not_to be(true)
+      end
+    end
+
+  end
+
+
+
 
 end
 
 
 
   #Board
-  # Valid Move
   # check_win
   # show_board
   # get_move --> Break out to "place move" and "get move"
+  # create a game_over method
